@@ -36,6 +36,11 @@ async def main():
         const dbtn = document.querySelector('#dbtn');
         const ylink = document.querySelector('#ylink');
         const vidName = document.querySelector('#name');
+        
+        dbtn.onclick = () => {
+            dbtn.download = vidName.value;
+        }
+
         sbtn.onclick = async () => {
             dbtn.innerText = "Converting...";
             sbtn.disabled = true;
@@ -49,7 +54,6 @@ async def main():
             const dlink = URL.createObjectURL(b);
 
             dbtn.href = dlink;
-            dbtn.download = vidName.value + ".mp3";
             dbtn.innerText = "Click to Download";
             sbtn.disabled = false;
         }
