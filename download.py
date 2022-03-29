@@ -23,8 +23,12 @@ async def main():
             <button id="sbtn">Submit</button>
         </div>
         <div style="margin-top: 20">
-            <p id="name"></p>
-            <a download id="dbtn"></a>
+            <div>
+                <p style="display: inline">Save As: </p> <input style="display: inline" id="name" type="text"></input> <p style="display: inline">.mp3</p>
+            </div>
+            <div style="margin-top: 20"> 
+                <a  download id="dbtn"></a>
+            </div>
         </div>
     </div>
     <script>
@@ -38,14 +42,14 @@ async def main():
 
             const resp1 = await fetch(`/title?url=${ylink.value}`);
             const j = await resp1.json();
-            vidName.innerText = j.title;
+            vidName.value = j.title;
 
             const resp2 = await fetch(`/download?url=${ylink.value}`);
             const b = await resp2.blob();
             const dlink = URL.createObjectURL(b);
 
             dbtn.href = dlink;
-            dbtn.download = j.title + ".mp3";
+            dbtn.download = vidName.value + ".mp3";
             dbtn.innerText = "Click to Download";
             sbtn.disabled = false;
         }
