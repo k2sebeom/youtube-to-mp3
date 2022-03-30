@@ -71,6 +71,7 @@ def title(url: str):
     stream = yt.streams.filter(progressive=True, file_extension='mp4').get_lowest_resolution()
     return { "title": stream.title }
 
+
 def clean(dpath):
     shutil.rmtree(dpath)
 
