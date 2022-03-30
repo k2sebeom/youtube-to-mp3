@@ -16,11 +16,30 @@ app = FastAPI()
 @app.get("/")
 async def main():
     content = """
+<head>
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-items: stretch;
+        }
+
+        .container {
+            background-color: skyblue;
+            padding: 10;
+            width: 100vw;
+        }
+
+        input {
+            width: 400;
+        }
+    </style>
+</head>
 <body>
-    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <div>
-        <div>
-            <h1>Download Youtube Video</h1>
+    <div class="container">
+        <h1>Download Youtube Video</h1>
+        <div> 
             <input id="ylink" type="text">
             <button id="sbtn">Submit</button>
         </div>
@@ -30,17 +49,27 @@ async def main():
             </div>
             <div style="margin-top: 20"> 
                 <a  download id="dbtn"></a>
+                <button id="nbtn" style="visibility: hidden;">Convert Next</button>
             </div>
         </div>
     </div>
     <script>
         const sbtn = document.querySelector('#sbtn');
         const dbtn = document.querySelector('#dbtn');
+        const nbtn = document.querySelector('#nbtn');
         const ylink = document.querySelector('#ylink');
         const vidName = document.querySelector('#name');
         
         dbtn.onclick = () => {
             dbtn.download = vidName.value + '.mp3';
+        }
+
+        nbtn.onclick = () => {
+            vidName.value = "";
+            ylink.value = "";
+            nbtn.style.visibility = 'hidden';
+            dbtn.innerText = '';
+            dbtn.href = '';
         }
 
         sbtn.onclick = async () => {
@@ -58,6 +87,7 @@ async def main():
             dbtn.href = dlink;
             dbtn.innerText = "Click to Download";
             sbtn.disabled = false;
+            nbtn.style.visibility = 'visible';
         }
     </script>
 </body>
