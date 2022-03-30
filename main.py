@@ -17,6 +17,7 @@ app = FastAPI()
 async def main():
     content = """
 <head>
+    <title>My Youtube to Mp3</title>
     <style>
         body {
             height: 100vh;
