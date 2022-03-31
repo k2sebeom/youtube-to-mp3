@@ -61,6 +61,7 @@ async def main():
             nbtn.style.visibility = 'hidden';
             dbtn.innerText = '';
             dbtn.href = '';
+            sbtn.disabled = false;
         }
 
         const sbtn = document.querySelector('#sbtn');
