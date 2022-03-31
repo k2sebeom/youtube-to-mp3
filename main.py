@@ -62,7 +62,7 @@ async def main():
             dbtn.innerText = '';
             dbtn.href = '';
             sbtn.disabled = false;
-            dbtn.disabled = false;
+            dbtn.disabled = true;
         }
 
         const sbtn = document.querySelector('#sbtn');
