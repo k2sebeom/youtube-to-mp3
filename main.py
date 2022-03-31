@@ -55,6 +55,14 @@ async def main():
         </div>
     </div>
     <script>
+        function reset() {
+            vidName.value = "";
+            ylink.value = "";
+            nbtn.style.visibility = 'hidden';
+            dbtn.innerText = '';
+            dbtn.href = '';
+        }
+
         const sbtn = document.querySelector('#sbtn');
         const dbtn = document.querySelector('#dbtn');
         const nbtn = document.querySelector('#nbtn');
@@ -65,13 +73,7 @@ async def main():
             dbtn.download = vidName.value + '.mp3';
         }
 
-        nbtn.onclick = () => {
-            vidName.value = "";
-            ylink.value = "";
-            nbtn.style.visibility = 'hidden';
-            dbtn.innerText = '';
-            dbtn.href = '';
-        }
+        nbtn.onclick = reset;
 
         sbtn.onclick = async () => {
             dbtn.innerText = "Converting...";
@@ -79,6 +81,13 @@ async def main():
 
             const resp1 = await fetch(`/title?url=${ylink.value}`);
             const j = await resp1.json();
+
+            if (!j.status) {
+                alert("Youtube link is not valid!!");
+                reset();
+                return;
+            }
+
             vidName.value = j.title;
 
             const resp2 = await fetch(`/download?url=${ylink.value}`);
@@ -98,19 +107,26 @@ async def main():
 
 @app.get("/title")
 def title(url: str):
-    yt = YouTube(url)
+    try:
+        yt = YouTube(url)
+    except:
+        return { "status": False, "title": "" }
     stream = yt.streams.filter(progressive=True, file_extension='mp4').get_lowest_resolution()
-    return { "title": stream.title }
+    return { "status": True, "title": stream.title }
 
 
 def clean(dpath):
     shutil.rmtree(dpath)
 
+
 @app.get("/download")
 def download(url: str, background_tasks: BackgroundTasks):
     tempdir = tempfile.mkdtemp()
     background_tasks.add_task(clean, tempdir)
-    yt = YouTube(url)
-    fpath = yt.streams.filter(progressive=True, file_extension='mp4').get_lowest_resolution().download(tempdir)
-    os.system(f'ffmpeg -i "{fpath}" -f mp3 -y {tempdir}/out.mp3')
-    return FileResponse(path=f'{tempdir}/out.mp3')
+    try:
+        yt = YouTube(url)
+        fpath = yt.streams.filter(progressive=True, file_extension='mp4').get_lowest_resolution().download(tempdir)
+        os.system(f'ffmpeg -i "{fpath}" -f mp3 -y {tempdir}/out.mp3')
+        return FileResponse(path=f'{tempdir}/out.mp3')
+    except:
+        return None
