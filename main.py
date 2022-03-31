@@ -62,6 +62,7 @@ async def main():
             dbtn.innerText = '';
             dbtn.href = '';
             sbtn.disabled = false;
+            dbtn.disabled = false;
         }
 
         const sbtn = document.querySelector('#sbtn');
@@ -78,6 +79,7 @@ async def main():
 
         sbtn.onclick = async () => {
             dbtn.innerText = "Converting...";
+            dbtn.disabled = true;
             sbtn.disabled = true;
 
             const resp1 = await fetch(`/title?url=${ylink.value}`);
@@ -98,6 +100,7 @@ async def main():
             dbtn.href = dlink;
             dbtn.innerText = "Click to Download";
             sbtn.disabled = false;
+            dbtn.disabled = false;
             nbtn.style.visibility = 'visible';
         }
     </script>
