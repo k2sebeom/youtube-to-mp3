@@ -14,7 +14,7 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['youtube.com'],
+    allow_origins=['*'],
     allow_credentials=True,
     allow_methods=["GET"],
     allow_headers=["*"],
