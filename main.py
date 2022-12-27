@@ -1,6 +1,7 @@
 import ssl
 from pytube import YouTube
 from fastapi import FastAPI, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 import shutil
 import tempfile
@@ -11,6 +12,13 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['youtube.com'],
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def main():
