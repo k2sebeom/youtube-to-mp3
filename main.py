@@ -2,10 +2,9 @@ import ssl
 from pytube import YouTube
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import FileResponse, HTMLResponse
-from glob import glob
 import shutil
-import os
 import tempfile
+from uuid import uuid1
 
 
 ssl._create_default_https_context = ssl._create_stdlib_context
@@ -42,11 +41,6 @@ async def main():
         <h1>Download Youtube Video as Audio File</h1>
         <div> 
             <input id="ylink" type="text">
-            <span>format: </span>
-            <select name="fmt" id="fmt">
-                <option value="mp3">mp3</option>
-                <option value="wav">wav</option>
-            </select>
             <button id="sbtn">Submit</button>
         </div>
         <div style="margin-top: 20">
@@ -68,7 +62,6 @@ async def main():
             dbtn.innerText = '';
             dbtn.href = '';
             sbtn.disabled = false;
-            fmt.disabled = false;
             dbtn.style.pointerEvents = 'none';
         }
 
@@ -77,15 +70,10 @@ async def main():
         const nbtn = document.querySelector('#nbtn');
         const ylink = document.querySelector('#ylink');
         const vidName = document.querySelector('#name');
-        const fmt = document.querySelector('#fmt');
         const ext = document.querySelector('#ext');
-
-        fmt.onchange = (e) => {
-            ext.innerText = '.' + e.target.value;
-        }
         
         dbtn.onclick = () => {
-            dbtn.download = vidName.value + '.' + fmt.value;
+            dbtn.download = vidName.value + '.mp3';
         }
 
         nbtn.onclick = reset;
@@ -94,8 +82,7 @@ async def main():
             dbtn.innerText = "Converting...";
             dbtn.style.pointerEvents = 'none'
             sbtn.disabled = true;
-            fmt.disabled = true;
-
+  
             const resp1 = await fetch(`/title?url=${ylink.value}`);
             const j = await resp1.json();
 
@@ -107,7 +94,7 @@ async def main():
 
             vidName.value = j.title;
 
-            const resp2 = await fetch(`/download?url=${ylink.value}&fmt=${fmt.value}`);
+            const resp2 = await fetch(`/download?url=${ylink.value}`);
             const b = await resp2.blob();
             const dlink = URL.createObjectURL(b);
 
@@ -138,13 +125,12 @@ def clean(dpath):
 
 
 @app.get("/download")
-def download(url: str, fmt: str, background_tasks: BackgroundTasks):
+def download(url: str, background_tasks: BackgroundTasks):
     tempdir = tempfile.mkdtemp()
     background_tasks.add_task(clean, tempdir)
     try:
         yt = YouTube(url)
-        fpath = yt.streams.filter(progressive=True, file_extension='mp4').get_lowest_resolution().download(tempdir)
-        os.system(f'ffmpeg -i "{fpath}" -f {fmt} -y {tempdir}/out.{fmt}')
-        return FileResponse(path=f'{tempdir}/out.{fmt}')
+        fpath = yt.streams.filter(file_extension='mp4').get_audio_only().download(tempdir, filename=f'{uuid1()}.mp3')
+        return FileResponse(path=fpath)
     except:
         return None
